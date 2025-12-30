@@ -2,6 +2,8 @@ import { useState, useEffect, useContext } from 'react';
 import AuthContext from '../context/AuthContext';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_BASE_URL;
+
 const Dashboard = () => {
     const { user, logout, updateUser } = useContext(AuthContext);
     const [activeTab, setActiveTab] = useState('overview');
@@ -41,7 +43,7 @@ const Dashboard = () => {
         setMessage('');
 
         try {
-            const { data } = await axios.put('http://localhost:5000/api/users/update-profile', profileData);
+            const { data } = await axios.put(`${API_URL}/api/users/update-profile`, profileData);
             updateUser(data); // Update context with new user data
             setMessage('Profile updated successfully!');
         } catch (err) {
@@ -64,7 +66,7 @@ const Dashboard = () => {
         }
 
         try {
-            await axios.put('http://localhost:5000/api/users/change-password', passwords);
+            await axios.put(`${API_URL}/api/users/change-password`, passwords);
             setMessage('Password changed successfully!');
             setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' });
         } catch (err) {
@@ -241,10 +243,10 @@ const AdminPanel = () => {
         try {
             let query = `?page=${page}&limit=5`;
             if (search) query += `&search=${search}`;
-            if (roleFilter !== 'all') query += `&role=${roleFilter}`;
+            if (roleFilter) query += `&role=${roleFilter}`;
             if (statusFilter !== 'all') query += `&status=${statusFilter}`;
 
-            const { data } = await axios.get(`http://localhost:5000/api/users${query}`);
+            const { data } = await axios.get(`${API_URL}/api/users${query}`);
             setUsers(data.users);
             setTotalPages(data.pages);
         } catch (err) {
@@ -260,9 +262,9 @@ const AdminPanel = () => {
             setUsers(users.map(u => u._id === userId ? { ...u, status: newStatus } : u));
 
             if (newStatus === 'active') {
-                await axios.put(`http://localhost:5000/api/users/${userId}/activate`);
+                await axios.put(`${API_URL}/api/users/${userId}/activate`);
             } else {
-                await axios.put(`http://localhost:5000/api/users/${userId}/deactivate`);
+                await axios.put(`${API_URL}/api/users/${userId}/deactivate`);
             }
         } catch (err) {
             console.error('Failed to update status', err);
@@ -274,7 +276,7 @@ const AdminPanel = () => {
         if (!window.confirm('Are you sure you want to delete this user?')) return;
 
         try {
-            await axios.delete(`http://localhost:5000/api/users/${userId}`);
+            await axios.delete(`${API_URL}/api/users/${userId}`);
             setUsers(users.filter(u => u._id !== userId));
         } catch (err) {
             alert('Failed to delete user');

@@ -25,8 +25,10 @@ export const AuthProvider = ({ children }) => {
         setIsLoading(false);
     }, []);
 
+    const API_URL = import.meta.env.VITE_API_BASE_URL;
+
     const login = async (userData) => {
-        const response = await axios.post('http://localhost:5000/api/auth/login', userData);
+        const response = await axios.post(`${API_URL}/api/auth/login`, userData);
         if (response.data) {
             localStorage.setItem('user', JSON.stringify(response.data));
             setUser(response.data);
@@ -34,7 +36,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const signup = async (userData) => {
-        const response = await axios.post('http://localhost:5000/api/auth/signup', userData);
+        const response = await axios.post(`${API_URL}/api/auth/signup`, userData);
         if (response.data) {
             localStorage.setItem('user', JSON.stringify(response.data));
             setUser(response.data);
