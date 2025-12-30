@@ -47,4 +47,13 @@ A full-stack user management application with role-based authentication (Admin/U
 - **Vite** - Build tool
 - **JavaScript** - Core language
 
+## Docker images
+- **Frontend**
+docker pull kishoryadhav/user-management-frontend:latest
+
+- **Backend**
+docker pull kishoryadhav/user-management-backend:latest
+
+
+
 
