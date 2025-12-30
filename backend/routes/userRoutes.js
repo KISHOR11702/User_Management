@@ -9,9 +9,16 @@ const {
     deleteUser,
     getProfile,
     updateProfile,
-    changePassword
+    changePassword,
+    getUserCount
 } = require('../controllers/userController');
 const { protect, admin } = require('../middleware/authMiddleware');
+
+// ==================== PUBLIC ROUTES ====================
+
+// Get total user count
+router.route('/count')
+    .get(getUserCount);
 
 // ==================== USER ROUTES ====================
 

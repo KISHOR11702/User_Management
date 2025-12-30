@@ -325,6 +325,19 @@ const changePassword = async (req, res) => {
     }
 };
 
+// @desc    Get total count of users (public for verification)
+// @route   GET /api/users/count
+// @access  Public
+const getUserCount = async (req, res) => {
+    try {
+        const count = await User.countDocuments({});
+        res.json({ totalUsers: count });
+    } catch (error) {
+        console.error('Get User Count Error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 module.exports = {
     getUsers,
     getUserById,
@@ -334,6 +347,7 @@ module.exports = {
     deleteUser,
     getProfile,
     updateProfile,
-    changePassword
+    changePassword,
+    getUserCount
 };
 
