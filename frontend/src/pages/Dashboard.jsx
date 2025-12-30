@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import AuthContext from '../context/AuthContext';
 import axios from 'axios';
+import Notification from '../components/Notification';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -22,8 +23,7 @@ const Dashboard = () => {
     });
 
     // Validations & Messages
-    const [message, setMessage] = useState('');
-    const [error, setError] = useState('');
+    const [notification, setNotification] = useState(null);
     const [loading, setLoading] = useState(false);
 
     // Initial load
@@ -39,15 +39,31 @@ const Dashboard = () => {
     const handleProfileUpdate = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setError('');
-        setMessage('');
+        setNotification(null);
+
+        if (!profileData.fullName || !profileData.email) {
+            setNotification({ message: 'Please fill in all fields', type: 'error' });
+            setLoading(false);
+            return;
+        }
+
+        const nameRegex = /^[a-zA-Z\s]+$/;
+        if (!nameRegex.test(profileData.fullName)) {
+            setNotification({ message: 'Name can only contain letters and spaces', type: 'error' });
+            setLoading(false);
+            return;
+        }
 
         try {
             const { data } = await axios.put(`${API_URL}/api/users/update-profile`, profileData);
             updateUser(data); // Update context with new user data
-            setMessage('Profile updated successfully!');
+            setNotification({ message: 'Profile updated successfully!', type: 'success' });
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to update profile');
+            let msg = err.response?.data?.message || 'Failed to update profile';
+            if (err.response?.data?.errors) {
+                msg = err.response.data.errors.map(e => e.msg).join(', ');
+            }
+            setNotification({ message: msg, type: 'error' });
         } finally {
             setLoading(false);
         }
@@ -56,21 +72,30 @@ const Dashboard = () => {
     const handlePasswordChange = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setError('');
-        setMessage('');
+        setNotification(null);
+
+        if (!passwords.currentPassword || !passwords.newPassword || !passwords.confirmPassword) {
+            setNotification({ message: 'Please fill in all fields', type: 'error' });
+            setLoading(false);
+            return;
+        }
 
         if (passwords.newPassword !== passwords.confirmPassword) {
-            setError('New passwords do not match');
+            setNotification({ message: 'New passwords do not match', type: 'error' });
             setLoading(false);
             return;
         }
 
         try {
             await axios.put(`${API_URL}/api/users/change-password`, passwords);
-            setMessage('Password changed successfully!');
+            setNotification({ message: 'Password changed successfully!', type: 'success' });
             setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' });
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to change password');
+            let msg = err.response?.data?.message || 'Failed to change password';
+            if (err.response?.data?.errors) {
+                msg = err.response.data.errors.map(e => e.msg).join(', ');
+            }
+            setNotification({ message: msg, type: 'error' });
         } finally {
             setLoading(false);
         }
@@ -78,6 +103,13 @@ const Dashboard = () => {
 
     return (
         <div className="container">
+            {notification && (
+                <Notification
+                    message={notification.message}
+                    type={notification.type}
+                    onClose={() => setNotification(null)}
+                />
+            )}
             <header className="navbar" style={{ borderRadius: 'var(--radius)', marginTop: '1rem' }}>
                 <div style={{ fontWeight: 'bold', fontSize: '1.4rem', color: 'white' }}>UserManagement</div>
                 <div className="nav-links">
@@ -141,10 +173,8 @@ const Dashboard = () => {
                             {/* Update Profile Form */}
                             <div>
                                 <h3>Update Profile</h3>
-                                {message && <div style={{ color: 'var(--success)', marginBottom: '1rem' }}>{message}</div>}
-                                {error && <div style={{ color: 'var(--error)', marginBottom: '1rem' }}>{error}</div>}
 
-                                <form onSubmit={handleProfileUpdate}>
+                                <form onSubmit={handleProfileUpdate} noValidate>
                                     <div className="input-group">
                                         <label className="input-label">Full Name</label>
                                         <input
@@ -172,7 +202,7 @@ const Dashboard = () => {
                             {/* Change Password Form */}
                             <div>
                                 <h3>Change Password</h3>
-                                <form onSubmit={handlePasswordChange}>
+                                <form onSubmit={handlePasswordChange} noValidate>
                                     <div className="input-group">
                                         <label className="input-label">Current Password</label>
                                         <input

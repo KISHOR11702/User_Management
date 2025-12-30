@@ -293,3 +293,143 @@ select.input-field {
     padding: 2rem 1.5rem;
   }
 }
+
+/* Notification Card System */
+.notification-card {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  width: 320px;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  z-index: 10000;
+  animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1), fadeOut 0.3s ease-in 4.7s forwards;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.notification-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.notification-success {
+  border-left: 1px solid rgba(74, 222, 128, 0.5);
+}
+
+.notification-success::before {
+  background: #4ade80;
+  box-shadow: 0 0 15px rgba(74, 222, 128, 0.6);
+}
+
+.notification-error {
+  border-left: 1px solid rgba(248, 113, 113, 0.5);
+}
+
+.notification-error::before {
+  background: #f87171;
+  box-shadow: 0 0 15px rgba(248, 113, 113, 0.6);
+}
+
+.notification-info {
+  border-left: 1px solid rgba(59, 130, 246, 0.5);
+}
+
+.notification-info::before {
+  background: #3b82f6;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+}
+
+.notification-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  color: white;
+}
+
+.notification-message {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.notification-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  margin-top: -4px;
+  transition: color 0.2s;
+}
+
+.notification-close:hover {
+  color: white;
+}
+
+.notification-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: white;
+  opacity: 0.2;
+  width: 100%;
+  animation: progress 5s linear forwards;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes progress {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    pointer-events: none;
+  }
+}

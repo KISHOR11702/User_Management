@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { check } = require('express-validator');
 const {
     getUsers,
     getUserById,
@@ -28,11 +29,21 @@ router.route('/profile')
 
 // Update profile (fullName and email)
 router.route('/update-profile')
-    .put(protect, updateProfile);
+    .put(protect, [
+        check('fullName')
+            .optional()
+            .not().isEmpty().withMessage('Full name cannot be empty')
+            .matches(/^[a-zA-Z\s]+$/).withMessage('Name can only contain letters and spaces'),
+        check('email', 'Please include a valid email address').optional().isEmail()
+    ], updateProfile);
 
 // Change password route
 router.route('/change-password')
-    .put(protect, changePassword);
+    .put(protect, [
+        check('newPassword')
+            .isLength({ min: 6 }).withMessage('New password must be at least 6 characters')
+            .matches(/\d/).withMessage('New password must contain at least one number')
+    ], changePassword);
 
 // ==================== ADMIN ROUTES ====================
 

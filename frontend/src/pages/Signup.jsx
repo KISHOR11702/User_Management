@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
+import Notification from '../components/Notification';
 
 const Signup = () => {
     const [formData, setFormData] = useState({
@@ -10,7 +11,7 @@ const Signup = () => {
         confirmPassword: '',
         role: 'user' // Default role
     });
-    const [error, setError] = useState('');
+    const [notification, setNotification] = useState(null);
     const [loading, setLoading] = useState(false);
 
     const { fullName, email, password, confirmPassword, role } = formData;
@@ -28,16 +29,31 @@ const Signup = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
+        setNotification(null);
 
-        if (password !== confirmPassword) {
-            setError('Passwords do not match');
+        if (!fullName || !email || !password || !confirmPassword) {
+            setNotification({ message: 'Please fill in all fields', type: 'error' });
             return;
         }
 
-        // Basic password strength (length)
+        const nameRegex = /^[a-zA-Z\s]+$/;
+        if (!nameRegex.test(fullName)) {
+            setNotification({ message: 'Name can only contain letters and spaces', type: 'error' });
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setNotification({ message: 'Passwords do not match', type: 'error' });
+            return;
+        }
+
         if (password.length < 6) {
-            setError('Password must be at least 6 characters');
+            setNotification({ message: 'Password must be at least 6 characters', type: 'error' });
+            return;
+        }
+
+        if (!/\d/.test(password)) {
+            setNotification({ message: 'Password must contain at least one number', type: 'error' });
             return;
         }
 
@@ -48,11 +64,13 @@ const Signup = () => {
             navigate('/dashboard');
         } catch (err) {
             // Handle array of errors from express-validator or single message
+            let msg = 'Signup failed';
             if (err.response?.data?.errors) {
-                setError(err.response.data.errors.map((e) => e.msg).join(', '));
-            } else {
-                setError(err.response?.data?.message || 'Signup failed');
+                msg = err.response.data.errors.map((e) => e.msg).join(', ');
+            } else if (err.response?.data?.message) {
+                msg = err.response.data.message;
             }
+            setNotification({ message: msg, type: 'error' });
         } finally {
             setLoading(false);
         }
@@ -60,10 +78,16 @@ const Signup = () => {
 
     return (
         <div className="center-box">
+            {notification && (
+                <Notification
+                    message={notification.message}
+                    type={notification.type}
+                    onClose={() => setNotification(null)}
+                />
+            )}
             <div className="glass-card auth-form">
                 <h1>Create Account</h1>
-                {error && <div style={{ color: 'var(--error)', marginBottom: '1rem' }}>{error}</div>}
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} noValidate>
                     <div className="input-group">
                         <label className="input-label">Full Name</label>
                         <input

@@ -1,11 +1,12 @@
 import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
+import Notification from '../components/Notification';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [notification, setNotification] = useState(null);
     const [loading, setLoading] = useState(false); // Local loading state for button
 
     // Use type assertion or optional chaining if context might be null
@@ -16,14 +17,24 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
+        setNotification(null);
+
+        if (!email || !password) {
+            setNotification({ message: 'Please fill in all fields', type: 'error' });
+            return;
+        }
+
         setLoading(true);
 
         try {
             await login({ email, password });
             navigate('/dashboard'); // Redirect to dashboard, will handle role based redirect there or in protected route
         } catch (err) {
-            setError(err.response?.data?.message || 'Login failed');
+            let msg = err.response?.data?.message || 'Login failed';
+            if (err.response?.data?.errors) {
+                msg = err.response.data.errors.map(e => e.msg).join(', ');
+            }
+            setNotification({ message: msg, type: 'error' });
         } finally {
             setLoading(false);
         }
@@ -31,10 +42,16 @@ const Login = () => {
 
     return (
         <div className="center-box">
+            {notification && (
+                <Notification
+                    message={notification.message}
+                    type={notification.type}
+                    onClose={() => setNotification(null)}
+                />
+            )}
             <div className="glass-card auth-form">
                 <h1>Welcome Back</h1>
-                {error && <div style={{ color: 'var(--error)', marginBottom: '1rem' }}>{error}</div>}
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} noValidate>
                     <div className="input-group">
                         <label className="input-label">Email Address</label>
                         <input

@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const { validationResult } = require('express-validator');
 
 // @desc    Get all users with pagination and search
 // @route   GET /api/users
@@ -239,6 +240,11 @@ const getProfile = async (req, res) => {
 // @route   PUT /api/users/profile
 // @access  Private
 const updateProfile = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     try {
         const { fullName, email } = req.body;
         const user = await User.findById(req.user.id);
@@ -285,6 +291,11 @@ const updateProfile = async (req, res) => {
 // @route   PUT /api/users/change-password
 // @access  Private
 const changePassword = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     try {
         const { currentPassword, newPassword, confirmPassword } = req.body;
 
