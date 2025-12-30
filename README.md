@@ -42,10 +42,10 @@ A full-stack user management application with role-based authentication (Admin/U
 
 ### Frontend
 - **React** - UI library
-- **TypeScript** - Type safety
 - **React Router** - Navigation
 - **Axios** - HTTP client
 - **Vite** - Build tool
+- **JavaScript** - Core language
 
 ## Installation
 
@@ -77,7 +77,7 @@ JWT_SECRET=your_jwt_secret_key_here
 ```bash
 npm start
 # or with nodemon for development
-nodemon server.js
+npm run dev
 ```
 
 ### Frontend Setup
@@ -238,13 +238,15 @@ UserManagement/
 ├── frontend/
 │   ├── src/
 │   │   ├── context/
-│   │   │   └── AuthContext.tsx
+│   │   │   └── AuthContext.jsx
 │   │   ├── pages/
-│   │   │   ├── Login.tsx
-│   │   │   └── Signup.tsx
-│   │   ├── App.tsx
-│   │   └── main.tsx
-│   └── package.json
+│   │   │   ├── Login.jsx
+│   │   │   ├── Signup.jsx
+│   │   │   └── Dashboard.jsx
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── package.json
+│   └── vite.config.js
 └── README.md
 ```
 
